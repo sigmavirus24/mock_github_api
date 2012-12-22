@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>
+            {% block title %}{% endblock %}
+        </title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <link href={{ url_for('static', filename='default.css') }}
+        type="text/css" rel="stylesheet" />
+        <meta name="author" content="Ian Cordasco">
+    </head>
+
+    <body>
+        <h1>
+            {% block header %}{% endblock %}
+        </h1>
+
+        {% block extraheader %}{% endblock %}
+
+        <p>
+        {% block body %}{% endblock %}
+        </p>
+
+        <div id="footer">
+            <p>
+            &copy; Copyright 2012 - Ian Cordasco.
+            <a href="https://github.com/sigmavirus24/mock_github_api">
+                Fork this project on GitHub
+            </a>
+            </p>
+        </div>
+    </body>
+</html>
