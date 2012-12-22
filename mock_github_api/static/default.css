@@ -1,3 +1,5 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
 a {
     text-decoration: none;
     font-weight: normal;
@@ -10,15 +12,15 @@ a:hover {
 body {
     margin: 0 auto 0 auto;
     padding: 5px;
-    width: 700px;
+    width: 600px;
     text-align: center;
-    font-family: sans-serif;
+    font-family: "Open Sans", sans-serif;
     font-size: 10pt;
 }
 
 body h1 {
     margin: 0;
-    font-family: serif;
+    font-family: "Open Sans", serif;
     font-size: 24pt;
     padding-bottom: 5px;
 }
