@@ -21,7 +21,10 @@ def auth_user():
 
 @app.route('/users/<login>')
 def get_user(login):
-    response = response_from_fixture('user')
+    if login == 'alejandrogomez':
+        response = response_from_fixture('utf8_user')
+    else:
+        response = response_from_fixture('user')
     if response.data is '':
         response.status_code = 404
     return response
