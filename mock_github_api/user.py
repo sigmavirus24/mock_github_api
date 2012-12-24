@@ -47,7 +47,7 @@ def repos():
 
 @app.route('/user/starred/<login>/<repo>', methods=['DELETE', 'PUT'])
 @app.route('/user/subscriptions/<login>/<repo>', methods=['DELETE', 'PUT'])
-def star_subscribe(login repo):
+def star_subscribe(login, repo):
     return boolean_response(204)
 
 
