@@ -17,12 +17,22 @@ def emails():
     if not is_authorized():
         return not_authorized_response()
 
-    response = response_from_fixture('email', True)
-    if request.method == 'POST':
-        response.status_code = 201
-    elif request.method == 'DELETE':
-        response.status_code = 204
-        response.data = None
+    valid = False
+    data = request.json
+    print data
+    if data:
+        is_str = all([isinstance(e, basestring) for e in data])
+        if isinstance(data, list) and is_str:
+            valid = True
+
+    response = response_from_fixture('emails', True)
+    if valid:
+        if request.method == 'POST':
+            response.status_code = 201
+        elif request.method == 'DELETE':
+            response = boolean_response(204)
+    elif request.method != 'GET':
+        response = failed_validation_response()
 
     return response
 

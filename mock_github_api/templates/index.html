@@ -9,11 +9,16 @@ A mock GitHub API with no ratelimit
 {% endblock %}
 
 {% block body %}
-A few months ago, I wrote 99% of my unittests for <a 
+A few months ago, I wrote unittests for 99% of <a 
     href="https://github.com/sigmavirus24/github3.py">github3.py</a> against 
 the GitHub API directly. Then GitHub changed the anonyous ratelimit from 5000 
 requests per hour to 60 and all my tests started failing. I started rewriting 
 them with mock but then one of my testing tricks started failing with requests 
 1.0. So, since this seemed to be desirable to many, I decided to start this.  
 Documentation of the end points for testing is forthcoming.
+</p>
+<p>
+This will only test the <code>vnd.github.v3</code> mimetype, so check 
+endpoints like <code>/user/emails</code> will return different <a 
+    "http://developer.github.com/v3/users/emails/">objects</a>.
 {% endblock %}
