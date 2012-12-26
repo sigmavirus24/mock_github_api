@@ -1,6 +1,8 @@
+from flask import request
 from mock_github_api.core import app
 from mock_github_api.helpers import (response_from_fixture, boolean_response,
-                                     is_authorized, not_authorized_response)
+                                     is_authorized, not_authorized_response,
+                                     failed_validation_response)
 
 
 @app.route('/user', methods=['GET', 'PATCH'])
@@ -14,7 +16,15 @@ def user():
 def emails():
     if not is_authorized():
         return not_authorized_response()
-    return response_from_fixture('email', True, 404)
+
+    response = response_from_fixture('email', True)
+    if request.method == 'POST':
+        response.status_code = 201
+    elif request.method == 'DELETE':
+        response.status_code = 204
+        response.data = None
+
+    return response
 
 
 @app.route('/user/followers')
@@ -22,20 +32,40 @@ def emails():
 def iter_following():
     if not is_authorized():
         return not_authorized_response()
-    return response_from_fixture('user', True, 404)
+    return response_from_fixture('user', True)
+
+
+@app.route('/user/following/<login>', methods=['GET', 'DELETE'])
+def is_following(login):
+    if not is_authorized():
+        return not_authorized_response()
+    return boolean_response(204)
 
 
 @app.route('/user/issues')
 def issues():
     if not is_authorized():
         return not_authorized_response()
-    return response_from_fixture('issue', True, 404)
+    return response_from_fixture('issue', True)
 
 
-@app.route('/user/keys/<id>')
+@app.route('/user/keys/<id>', methods=['GET', 'PATCH', 'DELETE'])
 def key(id):
     if not is_authorized():
         return not_authorized_response()
+
+    if request.method == 'DELETE':
+        return boolean_response(204)
+    elif request.method == 'PATCH':
+        valid = valid_key = False
+        if request.json:
+            valid = request.json.get('title') and request.json.get('key')
+            key = request.json.get('key', '')
+            valid_key = key.startswith('ssh-rsa ') and len(key) >= 8
+
+        if not (valid_key and valid):
+            return failed_validation_response()
+
     return response_from_fixture('key', status_code=404)
 
 
@@ -43,23 +73,34 @@ def key(id):
 def keys():
     if not is_authorized():
         return not_authorized_response()
-    return response_from_fixture('key', True, 404)
+    return response_from_fixture('key', True)
 
 
 @app.route('/user/orgs')
 def orgs():
     if not is_authorized():
         return not_authorized_response()
-    return response_from_fixture('org', True, 404)
+    return response_from_fixture('org', True)
 
 
-@app.route('/user/repos')
-@app.route('/user/starred')
-@app.route('/user/subscriptions')
+@app.route('/user/repos', methods=['GET', 'POST'])
 def repos():
     if not is_authorized():
         return not_authorized_response()
-    return response_from_fixture('repo', True, 404)
+
+    if request.method == 'POST':
+        if not (request.json and request.json.get('name')):
+            return failed_validation_response()
+
+    return response_from_fixture('repo', True, paginate=True)
+
+
+@app.route('/user/starred')
+@app.route('/user/subscriptions')
+def starred_subscribed():
+    if not is_authorized():
+        return not_authorized_response()
+    return response_from_fixture('repo', True, paginate=True)
 
 
 @app.route('/user/starred/<login>/<repo>', methods=['DELETE', 'PUT'])

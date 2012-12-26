@@ -13,7 +13,6 @@ def get_fixture(name, array=False):
 
     directory = os.path.dirname(__file__)
     fixture = os.path.join(directory, 'fixtures', name)
-    print fixture
     if os.path.isfile(fixture):
         json = open(fixture).read()
         if array:
@@ -22,7 +21,7 @@ def get_fixture(name, array=False):
     return ''
 
 
-def _json_response(paginate):
+def _json_response(paginate=False):
     response = make_response()
     response.content_type = 'application/json; charset=utf-8'
     response.mimetype = 'application/json'
@@ -64,6 +63,14 @@ def not_authorized_response():
     return response
 
 
+def failed_validation_response():
+    """Respond that the data sent failed validation."""
+    response = _json_response()
+    response.status_code = 422
+    response.data = '{"message": "Validation Failed"}'
+    return response
+
+
 def is_authorized():
     """Checks to see if a request has an authorization header or a
     client_id/client_secret pair in the query string."""
@@ -82,7 +89,7 @@ def parse_accept():
                         '(?P<param>\w+)?\+(?P<format>\w+)')
         parse_accept._re = ex
 
-    header = request.headers.get('Accept')
+    header = request.headers.get('Accept', '')
     match = ex.match(header)
 
     if not (match and header):

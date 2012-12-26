@@ -14,3 +14,4 @@ __copyright__ = 'Copyright 2012 Ian Cordasco'
 
 import mock_github_api.user
 import mock_github_api.users
+import mock_github_api.repositories
