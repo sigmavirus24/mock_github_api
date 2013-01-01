@@ -19,7 +19,6 @@ def emails():
 
     valid = False
     data = request.json
-    print data
     if data:
         is_str = all([isinstance(e, basestring) for e in data])
         if isinstance(data, list) and is_str:

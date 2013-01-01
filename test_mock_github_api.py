@@ -1,5 +1,6 @@
 import mock_github_api.core
 import unittest
+import json
 
 
 class BaseTestCase(unittest.TestCase):
@@ -13,6 +14,11 @@ class BaseTestCase(unittest.TestCase):
 
     def assert_all(self, iterable, status_code):
         assert all([i.status_code == status_code for i in iterable])
+
+    def status_code(self, response, code):
+        assert response.status_code == code, (
+            'Expected %d but got %d' % (code, response.status_code)
+        )
 
     def make_calls(self, path, calls, **kwargs):
         return [c(path, **kwargs) for c in calls]
@@ -35,22 +41,45 @@ class BaseTestCase(unittest.TestCase):
         users = self.make_calls(path, calls, headers=self.headers)
         self.assert_all(users, 200)
 
-    def test_user_emails(self):
+    def test_unauth_user_emails(self):
         path = '/user/emails'
         calls = (self.app.get, self.app.post, self.app.delete)
-        # Un-authorized
         emails = self.make_calls(path, calls)
         self.assert_all(emails, 401)
-        # Authorized
-        email = self.app.get(path, headers=self.headers)
-        assert email.status_code == 200
-        email = self.app.post(path, data='["foo@bar.com"]',
-                              headers=self.headers)
-        assert email.status_code == 201
 
+    def test_get_user_emails(self):
+        path = '/user/emails'
+        email = self.app.get(path, headers=self.headers)
+        self.status_code(email, 200)
+
+    def test_post_user_emails(self):
+        path = '/user/emails'
+        #print self.headers
+        data = json.dumps(['foo@bar.com'])
+        email = self.app.post(path, data=data, headers=self.headers)
+        self.status_code(email, 201)
+
+    def test_delete_user_emails(self):
+        path = '/user/emails'
         email = self.app.delete(path, data='["foo@bar.com"]',
                                 headers=self.headers)
-        assert email.status_code == 204
+        self.status_code(email, 204)
+
+    def test_user_followers(self):
+        path = '/user/followers'
+        rv = self.app.get(path)
+        self.status_code(rv, 401)
+
+        rv = self.app.get(path, headers=self.headers)
+        self.status_code(rv, 200)
+
+    def test_user_following(self):
+        path = '/user/following'
+        rv = self.app.get(path)
+        self.status_code(rv, 401)
+
+        rv = self.app.get(path, headers=self.headers)
+        self.status_code(rv, 200)
 
 
 if __name__ == '__main__':
