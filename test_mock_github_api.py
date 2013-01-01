@@ -7,10 +7,13 @@ class BaseTestCase(unittest.TestCase):
     def setUp(self):
         mock_github_api.core.app.config['TESTING'] = True
         self.app = mock_github_api.core.app.test_client()
-        self.auth_headers = {'Authorization': 'Basic Zm9vOmJhcg=='}
-        self.json_headers = {'Content-Type': 'application/json'}
-        self.headers = self.auth_headers.copy()
-        self.headers.update(self.json_headers)
+        self.headers = {
+            'Authorization': 'Basic Zm9vOmJhcg==',
+        }
+        self.conf = {
+            'content_type': 'application/json',
+            'headers': self.headers,
+        }
 
     def assert_all(self, iterable, status_code):
         assert all([i.status_code == status_code for i in iterable])
@@ -56,13 +59,12 @@ class BaseTestCase(unittest.TestCase):
         path = '/user/emails'
         #print self.headers
         data = json.dumps(['foo@bar.com'])
-        email = self.app.post(path, data=data, headers=self.headers)
+        email = self.app.post(path, data=data, **self.conf)
         self.status_code(email, 201)
 
     def test_delete_user_emails(self):
         path = '/user/emails'
-        email = self.app.delete(path, data='["foo@bar.com"]',
-                                headers=self.headers)
+        email = self.app.delete(path, data='["foo@bar.com"]', **self.conf)
         self.status_code(email, 204)
 
     def test_user_followers(self):
