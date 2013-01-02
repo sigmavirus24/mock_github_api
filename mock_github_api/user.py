@@ -44,7 +44,7 @@ def iter_following():
     return response_from_fixture('user', True)
 
 
-@app.route('/user/following/<login>', methods=['GET', 'DELETE'])
+@app.route('/user/following/<login>', methods=['GET', 'PUT', 'DELETE'])
 def is_following(login):
     if not is_authorized():
         return not_authorized_response()

@@ -83,6 +83,27 @@ class BaseTestCase(unittest.TestCase):
         rv = self.app.get(path, headers=self.headers)
         self.status_code(rv, 200)
 
+    def test_user_is_following(self):
+        path = '/user/following/sigmavirus24'
+        calls = (self.app.get, self.app.put, self.app.delete)
+        emails = self.make_calls(path, calls)
+        self.assert_all(emails, 401)
+
+    def test_get_user_is_following(self):
+        path = '/user/following/sigmavirus24'
+        rv = self.app.get(path, headers=self.headers)
+        self.status_code(rv, 204)
+
+    def test_put_user_is_following(self):
+        path = '/user/following/sigmavirus24'
+        rv = self.app.put(path, headers=self.headers)
+        self.status_code(rv, 204)
+
+    def test_delete_user_is_following(self):
+        path = '/user/following/sigmavirus24'
+        rv = self.app.delete(path, headers=self.headers)
+        self.status_code(rv, 204)
+
 
 if __name__ == '__main__':
     unittest.main()
